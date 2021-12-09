@@ -13,8 +13,8 @@ def start_screen():
 # show user options
 def options():
     print("Select from the following menu options:\n1 View Tournaments available \n" \
-    "2 View by countries \n3 View games \n3 test \n4 Exit")
-    return helper.get_choice([1,2,3,4])
+    "2 View by countries \n3 View all games \n4 test \n5 Exit")
+    return helper.get_choice([1,2,3,4,5])
 
 def list_Tournaments():
     # song name list to check for existance and avoid error
@@ -128,6 +128,23 @@ def by_country():
         elif user_choice == 4:
             tiedquery(index)
 
+def view_Games():
+    query = '''
+    SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
+    t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
+    FROM game g
+    JOIN country hm ON g.HomeTeam = hm.countryID
+    JOIN country aw ON g.AwayTeam = aw.countryID
+    JOIN tournament t ON g.Tournament = t.tournamentID
+    JOIN city hci ON g.HostCity = hci.cityID
+    JOIN country hco ON g.HostCountry = hco.countryID
+    ORDER BY g.Date;
+    '''
+    results = db_ops.all_attributes(query)
+
+    print(results)
+
+
 
 
 while True:
@@ -137,8 +154,10 @@ while True:
     elif user_choice == 2:
         by_country()
     elif user_choice == 3:
-        homequery(9)
+        view_Games()
     elif user_choice == 4:
+        homequery(9)
+    elif user_choice == 5:
         print("Goodbye!")
         break
 
