@@ -137,7 +137,7 @@ def by_country():
         print("Which would you like to know about",choices[index]+"?" \
         "\n1 Games played \n" \
         "2 Games as home \n3 Games as away \n4 Games tied ")
-        return helper.get_choice([1,2,3,4,5])
+        user_choice = helper.get_choice([1,2,3,4,5])
         if user_choice == 1:
             playedquery(index)
         elif user_choice == 2:
