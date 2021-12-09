@@ -13,8 +13,8 @@ def start_screen():
 # show user options
 def options():
     print("Select from the following menu options:\n1 View Tournaments available \n" \
-    "2 View by countries \n3 View all games and data \n4 test \n5 Exit")
-    return helper.get_choice([1,2,3,4,5])
+    "2 View by countries \n3 View all games and data \n4 Exit")
+    return helper.get_choice([1,2,3,4])
 
 def list_Tournaments():
     # song name list to check for existance and avoid error
@@ -178,8 +178,6 @@ while True:
     elif user_choice == 3:
         view_Games()
     elif user_choice == 4:
-        gamesWon(4)
-    elif user_choice == 5:
         print("Goodbye!")
         break
 
