@@ -13,7 +13,7 @@ def start_screen():
 # show user options
 def options():
     print("Select from the following menu options:\n1 View Tournaments available \n" \
-    "2 View by countries \n3 View all games \n4 test \n5 Exit")
+    "2 View by countries \n3 View all games and data \n4 test \n5 Exit")
     return helper.get_choice([1,2,3,4,5])
 
 def list_Tournaments():
@@ -25,6 +25,25 @@ def list_Tournaments():
     names = db_ops.single_attribute(query)
 
     print(names)
+
+
+def playedquery(index):
+    queryPlay = '''
+    SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
+    t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
+    FROM game g
+    JOIN country hm ON g.HomeTeam = hm.countryID
+    JOIN country aw ON g.AwayTeam = aw.countryID
+    JOIN tournament t ON g.Tournament = t.tournamentID
+    JOIN city hci ON g.HostCity = hci.cityID
+    JOIN country hco ON g.HostCountry = hco.countryID
+    WHERE g.HomeTeam = '''+str(index)+''' OR g.AwayTeam = '''+str(index)+'''
+    ORDER BY g.Date;
+    '''
+
+    gamesPlayed = db_ops.all_attributes(queryPlay)
+
+    print(gamesPlayed)
 
 def homequery(index):
     queryHome = '''
@@ -43,7 +62,7 @@ def homequery(index):
 
     print(home)
 
-def awayquery(int):
+def awayquery(index):
     queryAway = '''
     SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
     t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
@@ -61,7 +80,25 @@ def awayquery(int):
 
     print(away)
 
-def tiedquery(int):
+def gamesWon(index):
+    queryTied = '''
+    SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
+    t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
+    FROM game g
+    JOIN country hm ON g.HomeTeam = hm.countryID
+    JOIN country aw ON g.AwayTeam = aw.countryID
+    JOIN tournament t ON g.Tournament = t.tournamentID
+    JOIN city hci ON g.HostCity = hci.cityID
+    JOIN country hco ON g.HostCountry = hco.countryID
+    WHERE g.HomeTeam = '''+str(index)+''' AND Homescore > AwayScore OR AwayTeam ='''+str(index)+''' AND HomeScore < AwayScore
+    ORDER BY g.Date;
+    '''
+
+    gamesWon = db_ops.all_attributes(queryTied)
+
+    print(gamesWon)
+
+def tiedquery(index):
     queryTied = '''
     SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
     t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
@@ -78,24 +115,6 @@ def tiedquery(int):
     gamesTied = db_ops.all_attributes(queryTied)
 
     print(gamesTied)
-
-def playedquery(int):
-    queryPlay = '''
-    SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
-    t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
-    FROM game g
-    JOIN country hm ON g.HomeTeam = hm.countryID
-    JOIN country aw ON g.AwayTeam = aw.countryID
-    JOIN tournament t ON g.Tournament = t.tournamentID
-    JOIN city hci ON g.HostCity = hci.cityID
-    JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.HomeTeam = '''+str(index)+''' OR g.AwayTeam = '''+str(index)+'''
-    ORDER BY g.Date;
-    '''
-
-    gamesPlayed = db_ops.all_attributes(queryPlay)
-
-    print(gamesPlayed)
 
 
 def by_country():
@@ -118,7 +137,7 @@ def by_country():
         print("Which would you like to know about",choices[index]+"?" \
         "\n1 Games played \n" \
         "2 Games as home \n3 Games as away \n4 Games tied ")
-        return helper.get_choice([1,2,3,4])
+        return helper.get_choice([1,2,3,4,5])
         if user_choice == 1:
             playedquery(index)
         elif user_choice == 2:
@@ -126,6 +145,8 @@ def by_country():
         elif user_choice == 3:
             awayquery(index)
         elif user_choice == 4:
+            gamesWon(index)
+        elif user_choice == 5:
             tiedquery(index)
 
 def view_Games():
@@ -156,7 +177,7 @@ while True:
     elif user_choice == 3:
         view_Games()
     elif user_choice == 4:
-        homequery(9)
+        gamesWon(4)
     elif user_choice == 5:
         print("Goodbye!")
         break
