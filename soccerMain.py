@@ -7,7 +7,7 @@ db_ops = db_operations()
 
 def start_screen():
     print("Welcome, soccer fan!")
-    Print("Below search through past tournament data.")
+    print("Below search through past tournament data.")
 
 
 # show user options
@@ -167,6 +167,7 @@ def view_Games():
 
 
 
+start_screen()
 
 while True:
     user_choice = options()
