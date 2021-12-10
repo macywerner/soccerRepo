@@ -37,7 +37,7 @@ def playedquery(index):
     JOIN tournament t ON g.Tournament = t.tournamentID
     JOIN city hci ON g.HostCity = hci.cityID
     JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.HomeTeam = '''+str(index)+''' OR g.AwayTeam = '''+str(index)+'''
+    WHERE HomeTeam = '''+str(index)+''' OR AwayTeam = '''+str(index)+'''
     ORDER BY g.Date;
     '''
 
@@ -55,7 +55,7 @@ def homequery(index):
     JOIN tournament t ON g.Tournament = t.tournamentID
     JOIN city hci ON g.HostCity = hci.cityID
     JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.HomeTeam = '''+str(index)+'''
+    WHERE HomeTeam = '''+str(index)+'''
     ORDER BY g.Date;
     '''
     home = db_ops.all_attributes(queryHome)
@@ -72,7 +72,7 @@ def awayquery(index):
     JOIN tournament t ON g.Tournament = t.tournamentID
     JOIN city hci ON g.HostCity = hci.cityID
     JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.AwayTeam = '''+str(index)+'''
+    WHERE AwayTeam = '''+str(index)+'''
     ORDER BY g.Date;
     '''
 
@@ -90,7 +90,7 @@ def gamesWon(index):
     JOIN tournament t ON g.Tournament = t.tournamentID
     JOIN city hci ON g.HostCity = hci.cityID
     JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.HomeTeam = '''+str(index)+''' AND Homescore > AwayScore OR AwayTeam ='''+str(index)+''' AND HomeScore < AwayScore
+    WHERE (HomeTeam = '''+str(index)+''' AND g.Homescore > AwayScore) OR (AwayTeam ='''+str(index)+''' AND g.HomeScore < AwayScore)
     ORDER BY g.Date;
     '''
 
@@ -108,7 +108,7 @@ def tiedquery(index):
     JOIN tournament t ON g.Tournament = t.tournamentID
     JOIN city hci ON g.HostCity = hci.cityID
     JOIN country hco ON g.HostCountry = hco.countryID
-    WHERE g.HomeTeam = '''+str(index)+''' OR g.AwayTeam = '''+str(index)+''' AND Homescore = AwayScore
+    WHERE HomeTeam = '''+str(index)+''' OR AwayTeam = '''+str(index)+''' AND g.Homescore = g.AwayScore
     ORDER BY g.Date;
     '''
 
@@ -132,12 +132,13 @@ def by_country():
             choices[i] = names[i]
         index = helper.get_choice(choices.keys())
 
-        index = index + 1
 
         print("Which would you like to know about",choices[index]+"?" \
         "\n1 Games played \n" \
-        "2 Games as home \n3 Games as away \n4 Games tied ")
+        "2 Games as home \n3 Games as away \n4 Games Won \n5 Games tied")
         user_choice = helper.get_choice([1,2,3,4,5])
+
+        index = index + 1
         if user_choice == 1:
             playedquery(index)
         elif user_choice == 2:
