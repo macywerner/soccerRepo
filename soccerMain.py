@@ -22,10 +22,7 @@ def list_Tournaments():
     SELECT Name
     FROM tournament;
     '''
-    names = db_ops.single_attribute(query)
-
-    print(names)
-
+    helper.pretty_print(db_ops.single_attribute(query))
 
 def playedquery(index):
     queryPlay = '''
@@ -165,6 +162,7 @@ def view_Games():
     results = db_ops.all_attributes(query)
 
     print(results)
+    
 
 
 
