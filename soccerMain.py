@@ -5,25 +5,6 @@ from operations import db_operations
 
 db_ops = db_operations()
 
-def start_screen():
-    print("Welcome, soccer fan!")
-    print("Below search through past tournament data.")
-
-
-# show user options
-def options():
-    print("Select from the following menu options:\n1 View Tournaments available \n" \
-    "2 View by countries \n3 View all games and data \n4 Exit")
-    return helper.get_choice([1,2,3,4])
-
-def list_Tournaments():
-    # song name list to check for existance and avoid error
-    query = '''
-    SELECT Name
-    FROM tournament;
-    '''
-    helper.pretty_print(db_ops.single_attribute(query))
-
 def playedquery(index):
     queryPlay = '''
     SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
@@ -113,16 +94,32 @@ def tiedquery(index):
 
     print(gamesTied)
 
+def start_screen():
+    print("Welcome, soccer fan!")
+    print("Below search through past tournament data.")
+
+
+# show user options
+def options():
+    print("Select from the following menu options:\n1 View Tournaments available \n" \
+    "2 View by countries \n3 View all games and data \n4 Add to the database \n5 Exit")
+    return helper.get_choice([1,2,3,4,5])
+
+def list_Tournaments():
+    query = '''
+    SELECT Name
+    FROM tournament;
+    '''
+    helper.pretty_print(db_ops.single_attribute(query))
+
 
 def by_country():
-        # song name list to check for existance and avoid error
         query = '''
         SELECT Name
         FROM country;
         '''
         names = db_ops.single_attribute(query)
 
-        # show genres in table, also create dictionary for choices
         choices = {}
         for i in range(len(names)):
             print(i,names[i])
@@ -162,7 +159,252 @@ def view_Games():
     results = db_ops.all_attributes(query)
 
     print(results)
-    
+
+def create_tournament():
+    tournament = input("What is the name of the tournament you would like to create? ")
+    tournament = "'"+tournament+"'"
+
+    query = '''
+    INSERT INTO tournament(Name)
+    VALUES('''+tournament+''');
+    '''
+
+    db_ops.execute_query(query)
+
+    print("Tournament successfully created.")
+
+# create_game last step not working
+def create_game():
+    date = input("What was the date of the game you would like to add? (ex. 2021-01-01) ")
+
+    print("Who was the Home team? ")
+    homequery = '''
+    SELECT Name
+    FROM country;
+    '''
+    names = db_ops.single_attribute(homequery)
+
+    choices = {}
+    for i in range(len(names)):
+        print(i,names[i])
+        choices[i] = names[i]
+    index = helper.get_choice(choices.keys())
+
+    hteam = index + 1
+
+    print("Who was the Away team? ")
+    awayquery = '''
+    SELECT Name
+    FROM country;
+    '''
+    names = db_ops.single_attribute(awayquery)
+
+    choices = {}
+    for i in range(len(names)):
+        print(i,names[i])
+        choices[i] = names[i]
+    index = helper.get_choice(choices.keys())
+
+    ateam = index + 1
+
+    hscore = input("What was the Home team's final score? ")
+
+    ascore = input("What was the Away team's final score? ")
+
+    print("What tournament did they play in?")
+    tourn_query = '''
+    SELECT Name
+    FROM tournament;
+    '''
+    names = db_ops.single_attribute(tourn_query)
+
+    choices = {}
+    for i in range(len(names)):
+        print(i,names[i])
+        choices[i] = names[i]
+    index = helper.get_choice(choices.keys())
+
+    tournament = index + 1
+
+    print("What city hosted the game ")
+    cityquery = '''
+    SELECT Name
+    FROM city;
+    '''
+    names = db_ops.single_attribute(cityquery)
+
+    choices = {}
+    for i in range(len(names)):
+        print(i,names[i])
+        choices[i] = names[i]
+    index = helper.get_choice(choices.keys())
+
+    city = index + 1
+
+    countryquery = '''
+    SELECT Name
+    FROM country
+    WHERE countryID IN (
+        SELECT country
+        FROM city
+        WHERE cityID = '''+str(city)+'''
+    );
+    '''
+    country = db_ops.single_record(countryquery)
+
+    shootout = input("Was there a shootout? (true or false) ")
+    if shootout.lower() == "true":
+        shootout = shoutout.upper()
+        hgoals = input("How many goals did the Home team make? ")
+        hgoals = "'"+hgoals+"'"
+        agoals = input("How many goals did the Away team make? ")
+        agoals = "'"+agoals+"'"
+    else:
+        shoutout = shootout.upper()
+
+    gamequery = '''
+    INSERT INTO game(Date, HomeTeam, AwayTeam, HomeScore, AwayScore, Tournament, HostCity, HostCountry, Shootout)
+    VALUES ('''+str(date)+''','''+str(hteam)+''','''+str(ateam)+''','''+str(hscore)+''','''+str(ascore)+''','''+str(tournament)+''','''+str(city)+''','''+str(country)+''','''+str(shootout)+''');
+    '''
+
+    db_ops.execute_query(gamequery)
+
+    shootout_query = '''
+    INSERT INTO shootout
+    VALUES ('''+hgoals+''','''+agoals+''');
+    '''
+
+    if shootout.lower() == "true":
+        db_ops.execute_query(shootout_query)
+
+    print("Game successfully added.")
+
+def add_country():
+    country = input("What is the name of the Country you would like to add? ")
+    country = "'"+country+"'"
+
+    query = '''
+    INSERT INTO country(Name)
+    VALUES('''+country+''');
+    '''
+
+    db_ops.execute_query(query)
+
+    print("Country successfully added.")
+
+def add_city():
+    print("Which country would you like to add a city in? (Select a number)")
+    query = '''
+    SELECT Name
+    FROM country;
+    '''
+    names = db_ops.single_attribute(query)
+
+    choices = {}
+    for i in range(len(names)):
+        print(i,names[i])
+        choices[i] = names[i]
+    index = helper.get_choice(choices.keys())
+
+    country = choices[index]
+    country = "'"+country+"'"
+
+    city = input("What is the name of the City you would like to add? ")
+    city = "'"+city+"'"
+
+    country_query = '''
+    SELECT countryID
+    FROM country
+    WHERE Name = '''+country+''';
+    '''
+    countryID = db_ops.single_record(country_query)
+
+    insert_city = '''
+    INSERT INTO city(Name, Country)
+    VALUES ('''+city+''','''+str(countryID)+''');
+    '''
+
+    db_ops.execute_query(insert_city)
+
+    print("City successfully added.")
+
+def create_func():
+    print("What would you like to create/add? \n1 Tournament\n2 Game\n3 Country\n4 City")
+    user_choice = helper.get_choice([1,2,3,4])
+    if user_choice == 1:
+        create_tournament()
+    elif user_choice == 2:
+        create_game()
+    elif user_choice == 3:
+        add_country()
+    elif user_choice == 4:
+        add_city()
+
+def edit_game():
+
+    # what was the date, who was the hometeam, who was the awayteam
+    #query them and store for the edits query
+    # query = '''
+    # SELECT
+    # FROM songs;
+    # '''
+    # names = db_ops.single_attribute(query)
+    # # ask song name
+    # choice = input("What song would you like to update? (song name, capitializtion matters)\n ")
+    #
+    # checkName = False
+    # while checkName == False:
+    #     if choice not in names:
+    #         choice = input("Song does not exist, try another name:  ")
+    #     else:
+    #         checkName = True
+    #
+    # # edit choice to be ready for query
+    # choice = "'"+choice+"'"
+    #
+    # # select song attributes from table
+    # query = "SELECT * FROM songs WHERE Name= "+choice
+    # attributes = db_ops.all_attributes(query)
+    #
+    # # get songID
+    # query = "SELECT songID FROM songs WHERE Name= "+choice
+    # song_ID = db_ops.single_record(query)
+    # song_ID= "'"+song_ID+"'"
+
+    # prompt user for desired attribute
+    print("Which attribute would you like to update? \n1 Date\n2 Home Team\n3 AwayTeam\n4 Home Score\n5 Away Score\n6 Tournament\n7 Host Cityn\8 Shootout")
+    attribute = helper.get_choice([1,2,3,4,5,6,7,8])
+
+    #prompt user for desired input update
+    update = input("What would you like to update? ")
+    update = "'"+update+"'"
+
+    # if statement for update, can only update song name, album name, artist name, release date, and Explicit
+    attributeName = " "
+    if attribute == 1:
+        attributeName = "Date"
+    elif attribute == 2:
+        attributeName = "HomeTeam"
+    elif attribute == 3:
+        attributeName = "AwayTeam"
+    elif attribute == 4:
+        attributeName = "HomeScore"
+    elif attribute == 5:
+        attributeName = "AwayScore"
+    elif attribute == 6:
+        attributeName = "Tournament"
+    elif attribute == 7:
+        attributeName = "HostCity"
+    elif attribute == 8:
+        attributeName = "Shootout"
+
+    # update attribute query
+    query = "UPDATE songs SET "+attributeName+" = "+update+" WHERE songID = "+song_ID+";"
+    db_ops.execute_query(query)
+
+    print("Update successful")
+
+
 
 
 
@@ -177,6 +419,8 @@ while True:
     elif user_choice == 3:
         view_Games()
     elif user_choice == 4:
+        create_func()
+    elif user_choice == 5:
         print("Goodbye!")
         break
 
