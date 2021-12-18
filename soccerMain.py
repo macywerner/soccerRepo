@@ -1,4 +1,4 @@
-import uuid
+1import uuid
 from helper import helper
 from operations import db_operations
 
@@ -145,6 +145,7 @@ def by_country():
             tiedquery(index)
 
 def view_Games():
+    #maybe make a view
     query = '''
     SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore,
     t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout
@@ -340,69 +341,79 @@ def create_func():
     elif user_choice == 4:
         add_city()
 
-def edit_game():
+def update_game():
 
-    # what was the date, who was the hometeam, who was the awayteam
-    #query them and store for the edits query
-    # query = '''
-    # SELECT
-    # FROM songs;
-    # '''
-    # names = db_ops.single_attribute(query)
-    # # ask song name
-    # choice = input("What song would you like to update? (song name, capitializtion matters)\n ")
-    #
-    # checkName = False
-    # while checkName == False:
-    #     if choice not in names:
-    #         choice = input("Song does not exist, try another name:  ")
-    #     else:
-    #         checkName = True
-    #
-    # # edit choice to be ready for query
-    # choice = "'"+choice+"'"
-    #
-    # # select song attributes from table
-    # query = "SELECT * FROM songs WHERE Name= "+choice
-    # attributes = db_ops.all_attributes(query)
-    #
-    # # get songID
-    # query = "SELECT songID FROM songs WHERE Name= "+choice
-    # song_ID = db_ops.single_record(query)
-    # song_ID= "'"+song_ID+"'"
+        query = '''
+        SELECT Date
+        FROM game;
+        '''
+        dates = db_ops.single_attribute(query)
 
-    # prompt user for desired attribute
-    print("Which attribute would you like to update? \n1 Date\n2 Home Team\n3 AwayTeam\n4 Home Score\n5 Away Score\n6 Tournament\n7 Host Cityn\8 Shootout")
-    attribute = helper.get_choice([1,2,3,4,5,6,7,8])
+        date = input("What was the date of the game you would like to update? (ex. 2021-01-01) ")
 
-    #prompt user for desired input update
-    update = input("What would you like to update? ")
-    update = "'"+update+"'"
 
-    # if statement for update, can only update song name, album name, artist name, release date, and Explicit
-    attributeName = " "
-    if attribute == 1:
-        attributeName = "Date"
-    elif attribute == 2:
-        attributeName = "HomeTeam"
-    elif attribute == 3:
-        attributeName = "AwayTeam"
-    elif attribute == 4:
-        attributeName = "HomeScore"
-    elif attribute == 5:
-        attributeName = "AwayScore"
-    elif attribute == 6:
-        attributeName = "Tournament"
-    elif attribute == 7:
-        attributeName = "HostCity"
-    elif attribute == 8:
-        attributeName = "Shootout"
+        checkDate = False
+        while checkDate == False:
+            if date not in dates:
+                date = input("Game on that date does not exist, try another date:  ")
+            else:
+                checkDate = True
 
-    # update attribute query
-    query = "UPDATE songs SET "+attributeName+" = "+update+" WHERE songID = "+song_ID+";"
-    db_ops.execute_query(query)
+        query = "SELECT * FROM game WHERE Date= "+str(date)
+        attributes = db_ops.all_attributes(query)
 
-    print("Update successful")
+        # need to ask for home and away teams then query that and check and then update 
+
+        # view_games = '''
+        # SELECT DISTINCT CONCAT(hm.Name," vs ",aw.Name) Teams
+        # FROM game g
+        # JOIN country hm ON g.HomeTeam = hm.countryID
+        # JOIN country aw ON g.AwayTeam = aw.countryID
+        # WHERE g.Date = '''+str(date)+''';
+        # '''
+        # games = db_ops.all_attributes(view_games)
+        #
+        # print("Which game on that date would you like to update?")
+        #
+        # choices = {}
+        # for i in range(len(games)):
+        #     print(i,games[i])
+        #     choices[i] = games[i]
+        # index = helper.get_choice(choices.keys())
+
+
+
+        # prompt user for desired attribute
+        print("Which attribute would you like to update? \n1 Date\n2 Home Team\n3 AwayTeam\n4 Home Score\n5 Away Score\n6 Tournament\n7 Host Cityn\8 Shootout")
+        attribute = helper.get_choice([1,2,3,4,5,6,7,8])
+
+        #prompt user for desired input update
+        update = input("What would you like to update it to? ")
+
+        # if statement for update, can only update song name, album name, artist name, release date, and Explicit
+        attributeName = " "
+        if attribute == 1:
+            attributeName = "Date"
+        elif attribute == 2:
+            attributeName = "HomeTeam"
+        elif attribute == 3:
+            attributeName = "AwayTeam"
+        elif attribute == 4:
+            attributeName = "HomeScore"
+        elif attribute == 5:
+            attributeName = "AwayScore"
+        elif attribute == 6:
+            attributeName = "Tournament"
+        elif attribute == 7:
+            attributeName = "HostCity"
+        elif attribute == 8:
+            attributeName = "Shootout"
+
+        # update attribute query
+        query = "UPDATE game SET "+attributeName+" = "+str(update)+" WHERE Date = "+str(date)+";"
+        db_ops.execute_query(query)
+
+        print("Update successful")
 
 
 
