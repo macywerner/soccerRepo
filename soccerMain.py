@@ -362,26 +362,58 @@ def update_game():
         query = "SELECT * FROM game WHERE Date= "+str(date)
         attributes = db_ops.all_attributes(query)
 
-        # need to ask for home and away teams then query that and check and then update 
+        view_games = '''
+        SELECT DISTINCT CONCAT(hm.Name," vs ",aw.Name) Teams
+        FROM game g
+        JOIN country hm ON g.HomeTeam = hm.countryID
+        JOIN country aw ON g.AwayTeam = aw.countryID
+        WHERE g.Date = '''+str(date)+''';
+                '''
+        games = db_ops.all_attributes(view_games)
 
-        # view_games = '''
-        # SELECT DISTINCT CONCAT(hm.Name," vs ",aw.Name) Teams
-        # FROM game g
-        # JOIN country hm ON g.HomeTeam = hm.countryID
-        # JOIN country aw ON g.AwayTeam = aw.countryID
-        # WHERE g.Date = '''+str(date)+''';
-        # '''
-        # games = db_ops.all_attributes(view_games)
-        #
-        # print("Which game on that date would you like to update?")
-        #
-        # choices = {}
-        # for i in range(len(games)):
-        #     print(i,games[i])
-        #     choices[i] = games[i]
-        # index = helper.get_choice(choices.keys())
+        for i in range(len(games)):
+            print(games[i])
 
 
+        print("From the games listed above,")
+        print("Who was the Home team? ")
+        homequery = '''
+        SELECT Name
+        FROM country;
+        '''
+        names = db_ops.single_attribute(homequery)
+
+        choices = {}
+        for i in range(len(names)):
+            print(i,names[i])
+            choices[i] = names[i]
+        index = helper.get_choice(choices.keys())
+
+        hteam = index + 1
+
+        print("Who was the Away team? ")
+        awayquery = '''
+        SELECT Name
+        FROM country;
+        '''
+        names = db_ops.single_attribute(awayquery)
+
+        choices = {}
+        for i in range(len(names)):
+            print(i,names[i])
+            choices[i] = names[i]
+        index = helper.get_choice(choices.keys())
+
+        ateam = index + 1
+
+        view_game = '''
+        SELECT *
+        FROM game
+        WHERE Date = '''+str(date)+'''
+        AND HomeTeam = '''+str(hteam)+'''
+        AND AwayTeam = '''+str(ateam)+''';
+        '''
+        game = db_ops.all_attributes(view_game)
 
         # prompt user for desired attribute
         print("Which attribute would you like to update? \n1 Date\n2 Home Team\n3 AwayTeam\n4 Home Score\n5 Away Score\n6 Tournament\n7 Host Cityn\8 Shootout")
@@ -412,6 +444,8 @@ def update_game():
         # update attribute query
         query = "UPDATE game SET "+attributeName+" = "+str(update)+" WHERE Date = "+str(date)+";"
         db_ops.execute_query(query)
+
+        # need to change shootout if necessary
 
         print("Update successful")
 
