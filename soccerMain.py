@@ -510,10 +510,13 @@ def update_game():
                 checkT = True
 
         #narrow down search
-        query = "SELECT * FROM game WHERE Tournament = (SELECT tournamentID FROM tournament WHERE Name = '"+str(name)+"');"
-        attributes = db_ops.all_attributes(query)
 
-        view_games = "SELECT hm.Name, aw.Name FROM game g JOIN country hm ON g.HomeTeam = hm.countryID JOIN country aw ON g.AwayTeam = aw.countryID WHERE Tournament = (SELECT tournamentID FROM tournament WHERE Name =  '"+str(name)+"');"
+        view_games = "SELECT hm.Name, aw.Name "
+        view_games += "FROM game g "
+        view_games += "JOIN country hm ON g.HomeTeam = hm.countryID "
+        view_games += "JOIN country aw ON g.AwayTeam = aw.countryID "
+        view_games += "WHERE Tournament = "
+        view_games += "(SELECT tournamentID FROM tournament WHERE Name =  '"+str(name)+"');"
 
         games = db_ops.all_attributes(view_games)
 
@@ -551,15 +554,18 @@ def update_game():
 
         ateam = index + 1
 
-        # query and show game details
-        view_game = "SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore, t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout"
-        view_game += "FROM game g JOIN country hm ON g.HomeTeam = hm.countryID JOIN country aw ON g.AwayTeam = aw.countryID JOIN tournament t ON g.Tournament = t.tournamentID JOIN city hci ON g.HostCity = hci.cityID JOIN country hco ON g.HostCountry = hco.countryID"
-        view_game += "WHERE HomeTeam = "+str(hteam)+" AND AwayTeam = "+str(ateam)+" AND tournament = "
-        view_game += "(SELECT tournamentID FROM tournament WHERE Name = '"+str(name)+"');"
-        view_game += "ORDER BY g.Date;"
-
-        game = db_ops.all_attributes(view_game)
-        print(game)
+        # # query and show game details
+        # view_game = "SELECT g.Date, hm.Name AS 'HomeTeam', g.HomeScore, aw.Name AS 'AwayTeam', g.AwayScore, t.Name AS 'Tournament', hci.Name AS 'HostCity', hco.Name AS 'HostCountry', g.Shootout"
+        # view_game += "FROM game g "
+        # view_game += "JOIN country hm ON g.HomeTeam = hm.countryID "
+        # view_game += "JOIN country aw ON g.AwayTeam = aw.countryID "
+        # view_game += "JOIN tournament t ON g.Tournament = t.tournamentID JOIN city hci ON g.HostCity = hci.cityID JOIN country hco ON g.HostCountry = hco.countryID"
+        # view_game += "WHERE HomeTeam = '"+str(hteam)+"' AND AwayTeam = '"+str(ateam)+"' AND tournament = "
+        # view_game += "(SELECT tournamentID FROM tournament WHERE Name = '"+str(name)+"');"
+        # view_game += "ORDER BY g.Date;"
+        #
+        # game = db_ops.all_attributes(view_game)
+        # print(game)
 
         # prompt user for desired attribute
         print("Which attribute would you like to update? \n1 Date\n2 Home Team\n3 AwayTeam\n4 Home Score\n5 Away Score\n6 Tournament\n7 Host City")
