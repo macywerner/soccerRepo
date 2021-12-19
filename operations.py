@@ -12,6 +12,12 @@ class db_operations():
         self.cursor = self.connection.cursor()
         print("connection made..")
 
+    def insert_one(self,query):
+        self.cursor.execute(query)
+
+    def commit(self):
+        self.connection.commit()
+
     # function for bulk inserting records
     def bulk_insert(self,query,records):
         self.cursor.executemany(query,records)
